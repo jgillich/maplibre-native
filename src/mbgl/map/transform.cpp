@@ -364,8 +364,14 @@ void Transform::flyTo(const CameraOptions& inputCamera,
 
             // Calculate the current point and zoom level along the flight path.
             Point<double> framePoint = util::interpolate(startPoint, endPoint, us);
-            double frameZoom = linearZoomInterpolation ? util::interpolate(startZoom, zoom, k)
-                                                       : startZoom + state.scaleZoom(1 / w(s));
+            double frameZoom;
+            if (startZoom == zoom) {
+                frameZoom = zoom;
+            } else if (linearZoomInterpolation) {
+                frameZoom = util::interpolate(startZoom, zoom, k);
+            } else {
+                frameZoom = startZoom + state.scaleZoom(1 / w(s));
+            }
 
             // Zoom can be NaN if size is empty.
             if (std::isnan(frameZoom)) {
